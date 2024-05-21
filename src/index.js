@@ -6,13 +6,17 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+app.use(express.json()); // Middleware para analizar cuerpos JSON
 
-const MONGODB_CONNECTION = process.env.MONGODB_URI;
+const MONGODB_CONNECTION = process.env.MONGODB_URI + "?ssl=true&retryWrites=true&w=majority";
 const DBNAME = "LeagueProject";
 let database;
 
 MongoClient.connect(MONGODB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
-    if (err) throw err;
+    if (err) {
+        console.error('Failed to connect to the database. ', err);
+        process.exit(1); // Salir del proceso si no se puede conectar a la base de datos
+    }
     database = client.db(DBNAME);
     console.log("Connected to database");
 
